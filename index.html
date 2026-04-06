@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Icey 9 — Premium Ice Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ice-deep: #020b18;
+    --ice-navy: #061428;
+    --ice-mid: #0a2240;
+    --ice-blue: #1a4a7a;
+    --ice-bright: #4db8ff;
+    --ice-crystal: #a8dcff;
+    --ice-white: #e8f4ff;
+    --ice-silver: #c8dff0;
+    --accent-glow: #00aaff;
+    --frost: rgba(168, 220, 255, 0.08);
+    --frost-border: rgba(168, 220, 255, 0.2);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ice-deep);
+    color: var(--ice-white);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom Cursor */
+  .cursor {
+    position: fixed; width: 10px; height: 10px;
+    background: var(--ice-bright); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    position: fixed; width: 36px; height: 36px;
+    border: 1px solid rgba(77, 184, 255, 0.5);
+    border-radius: 50%; pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.18s ease;
+  }
+
+  /* Particle Canvas */
+  #particle-canvas {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(2,11,24,0.95), transparent);
+    transition: all 0.4s ease;
+  }
+  nav.scrolled {
+    padding: 16px 60px;
+    background: rgba(2, 11, 24, 0.97);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--frost-border);
+  }
+  .nav-logo {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 1.3rem; font-weight: 700;
+    letter-spacing: 0.3em;
+    color: var(--ice-white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--ice-bright); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-family: 'Jost', sans-serif; font-weight: 400;
+    font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--ice-silver); text-decoration: none;
+    transition: color 0.3s; position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px; background: var(--ice-bright);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--ice-white); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    padding: 10px 28px;
+    border: 1px solid var(--frost-border);
+    font-family: 'Jost', sans-serif; font-size: 0.75rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--ice-crystal); text-decoration: none;
+    background: var(--frost);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+  }
+  .nav-cta:hover {
+    background: rgba(77,184,255,0.15);
+    border-color: var(--ice-bright);
+    color: var(--ice-white);
+    box-shadow: 0 0 20px rgba(77,184,255,0.2);
+  }
+
+  /* HERO */
+  #hero {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; overflow: hidden;
+    padding: 0 40px;
+    z-index: 1;
+  }
+
+  .hero-bg-rings {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(77,184,255,0.1);
+    animation: ringPulse 6s ease-in-out infinite;
+  }
+  .ring:nth-child(1) { width: 300px; height: 300px; animation-delay: 0s; }
+  .ring:nth-child(2) { width: 500px; height: 500px; animation-delay: 0.5s; border-color: rgba(77,184,255,0.07); }
+  .ring:nth-child(3) { width: 700px; height: 700px; animation-delay: 1s; border-color: rgba(77,184,255,0.05); }
+  .ring:nth-child(4) { width: 950px; height: 950px; animation-delay: 1.5s; border-color: rgba(77,184,255,0.03); }
+  .ring:nth-child(5) { width: 1200px; height: 1200px; animation-delay: 2s; border-color: rgba(77,184,255,0.02); }
+
+  @keyframes ringPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.03); opacity: 0.6; }
+  }
+
+  .hero-eyebrow {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase;
+    color: var(--ice-bright); margin-bottom: 28px;
+    opacity: 0; animation: fadeUp 1s ease 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Syncopate', sans-serif;
+    font-size: clamp(4rem, 12vw, 10rem);
+    font-weight: 700; line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--ice-white);
+    opacity: 0; animation: fadeUp 1.2s ease 0.5s forwards;
+    position: relative;
+  }
+  .hero-title .ice-gradient {
+    background: linear-gradient(135deg, #ffffff 0%, #a8dcff 40%, #4db8ff 70%, #0088dd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-number {
+    font-size: clamp(5rem, 15vw, 13rem);
+    font-weight: 700;
+    background: linear-gradient(180deg, rgba(77,184,255,0.9) 0%, rgba(0,100,200,0.3) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block; line-height: 1;
+    text-shadow: none;
+  }
+
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+    font-weight: 300; font-style: italic;
+    color: var(--ice-silver); margin-top: 24px;
+    letter-spacing: 0.05em;
+    opacity: 0; animation: fadeUp 1s ease 0.9s forwards;
+  }
+
+  .hero-divider {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, var(--ice-bright), transparent);
+    margin: 40px auto 0;
+    opacity: 0; animation: fadeUp 1s ease 1.1s forwards;
+  }
+
+  .hero-scroll-hint {
+    font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase;
+    color: rgba(168,220,255,0.4); margin-top: 12px;
+    opacity: 0; animation: fadeUp 1s ease 1.3s forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Ice cube floating animation behind hero title */
+  .hero-ice-cubes {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  }
+  .ice-cube {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(77,184,255,0.15), rgba(168,220,255,0.05));
+    border: 1px solid rgba(77,184,255,0.2);
+    backdrop-filter: blur(2px);
+    border-radius: 6px;
+    animation: floatCube linear infinite;
+  }
+  @keyframes floatCube {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    5% { opacity: 1; }
+    95% { opacity: 0.8; }
+    100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* SECTIONS */
+  section { position: relative; z-index: 1; }
+
+  .section-tag {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.6rem; letter-spacing: 0.5em; text-transform: uppercase;
+    color: var(--ice-bright); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .section-tag::before {
+    content: ''; display: block; width: 40px; height: 1px;
+    background: var(--ice-bright);
+  }
+
+  /* ABOUT */
+  #about {
+    padding: 120px 60px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+    align-items: center; max-width: 1400px; margin: 0 auto;
+  }
+
+  .about-visual {
+    position: relative; height: 500px;
+  }
+  .about-cube-art {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .big-cube {
+    width: 200px; height: 200px;
+    background: linear-gradient(135deg, rgba(77,184,255,0.2), rgba(10,34,64,0.8));
+    border: 1px solid rgba(77,184,255,0.4);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 60px rgba(77,184,255,0.15), inset 0 0 40px rgba(168,220,255,0.05);
+    animation: cubeFloat 5s ease-in-out infinite;
+    position: relative;
+  }
+  .big-cube::before {
+    content: '';
+    position: absolute; top: -1px; left: 30px;
+    width: 60%; height: 30px;
+    background: linear-gradient(to right, transparent, rgba(168,220,255,0.4), transparent);
+    border-radius: 50%;
+    filter: blur(6px);
+  }
+  .big-cube::after {
+    content: '❄';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem; opacity: 0.3;
+    color: var(--ice-crystal);
+  }
+  @keyframes cubeFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(3deg); }
+  }
+  .small-cube-1 {
+    position: absolute; top: 60px; right: 60px;
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, rgba(77,184,255,0.25), rgba(10,34,64,0.9));
+    border: 1px solid rgba(77,184,255,0.3);
+    border-radius: 10px; animation: cubeFloat 4s ease-in-out 1s infinite;
+  }
+  .small-cube-2 {
+    position: absolute; bottom: 80px; left: 40px;
+    width: 60px; height: 60px;
+    background: linear-gradient(135deg, rgba(0,170,255,0.2), rgba(6,20,40,0.9));
+    border: 1px solid rgba(77,184,255,0.25);
+    border-radius: 8px; animation: cubeFloat 6s ease-in-out 2s infinite;
+  }
+  .about-stat-grid {
+    position: absolute; bottom: 20px; right: 20px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .stat-box {
+    padding: 16px 20px;
+    background: var(--frost);
+    border: 1px solid var(--frost-border);
+    backdrop-filter: blur(10px);
+    border-radius: 8px; text-align: center;
+  }
+  .stat-box .num {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 1.6rem; font-weight: 700;
+    color: var(--ice-bright);
+    display: block;
+  }
+  .stat-box .lbl {
+    font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--ice-silver); margin-top: 4px; display: block;
+  }
+
+  .about-content h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-weight: 600; line-height: 1.15;
+    color: var(--ice-white); margin-bottom: 28px;
+  }
+  .about-content h2 em { color: var(--ice-bright); font-style: italic; }
+  .about-content p {
+    font-size: 1rem; line-height: 1.8; color: var(--ice-silver);
+    margin-bottom: 20px;
+  }
+  .founder-badge {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 12px 20px;
+    border: 1px solid var(--frost-border);
+    background: var(--frost);
+    backdrop-filter: blur(10px);
+    border-radius: 40px; margin-top: 12px;
+  }
+  .founder-badge .dot {
+    width: 8px; height: 8px; background: var(--ice-bright);
+    border-radius: 50%; box-shadow: 0 0 8px var(--ice-bright);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 8px var(--ice-bright)} 50%{box-shadow:0 0 20px var(--ice-bright)} }
+  .founder-badge span { font-size: 0.8rem; letter-spacing: 0.1em; color: var(--ice-silver); }
+  .founder-badge strong { color: var(--ice-crystal); }
+
+  /* PRODUCTS */
+  #products {
+    padding: 120px 60px;
+    background: linear-gradient(to bottom, transparent, rgba(10,34,64,0.3), transparent);
+  }
+  .products-header { text-align: center; margin-bottom: 80px; }
+  .products-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 600;
+    color: var(--ice-white);
+  }
+  .products-header p {
+    color: var(--ice-silver); margin-top: 16px;
+    font-size: 1rem; max-width: 500px; margin-inline: auto;
+  }
+
+  .products-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; max-width: 1200px; margin: 0 auto;
+  }
+
+  .product-card {
+    padding: 40px 32px;
+    background: linear-gradient(135deg, rgba(26,74,122,0.15), rgba(6,20,40,0.8));
+    border: 1px solid var(--frost-border);
+    border-radius: 20px; position: relative; overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: default;
+  }
+  .product-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent, var(--ice-bright), transparent);
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .product-card::after {
+    content: ''; position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(77,184,255,0.05) 0%, transparent 70%);
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .product-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(77,184,255,0.4);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(77,184,255,0.1);
+  }
+  .product-card:hover::before { opacity: 1; }
+  .product-card:hover::after { opacity: 1; }
+  .product-card.featured {
+    background: linear-gradient(135deg, rgba(26,74,122,0.35), rgba(6,20,40,0.9));
+    border-color: rgba(77,184,255,0.35);
+    box-shadow: 0 0 40px rgba(77,184,255,0.1);
+  }
+  .product-badge {
+    position: absolute; top: 20px; right: 20px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 6px 12px; border-radius: 20px;
+    background: rgba(77,184,255,0.15); border: 1px solid rgba(77,184,255,0.3);
+    color: var(--ice-bright);
+  }
+  .product-icon {
+    font-size: 3rem; margin-bottom: 24px; display: block;
+    filter: drop-shadow(0 0 12px rgba(77,184,255,0.4));
+  }
+  .product-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem; font-weight: 600;
+    color: var(--ice-white); margin-bottom: 12px;
+  }
+  .product-card p {
+    font-size: 0.9rem; line-height: 1.7;
+    color: rgba(168,220,255,0.7);
+  }
+  .product-specs {
+    margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  .spec-tag {
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 5px 12px; border-radius: 20px;
+    border: 1px solid var(--frost-border);
+    color: var(--ice-silver);
+    background: var(--frost);
+  }
+
+  /* MARQUEE */
+  .marquee-section {
+    padding: 40px 0; overflow: hidden;
+    border-top: 1px solid var(--frost-border);
+    border-bottom: 1px solid var(--frost-border);
+    background: rgba(10,34,64,0.2);
+  }
+  .marquee-track {
+    display: flex; gap: 60px; width: max-content;
+    animation: marquee 20s linear infinite;
+  }
+  .marquee-section:hover .marquee-track { animation-play-state: paused; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .marquee-item {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.7rem; letter-spacing: 0.4em; text-transform: uppercase;
+    color: rgba(168,220,255,0.3); white-space: nowrap;
+    display: flex; align-items: center; gap: 60px;
+  }
+  .marquee-item .dot { color: var(--ice-bright); font-size: 1rem; }
+
+  /* WHY US */
+  #why {
+    padding: 120px 60px;
+    max-width: 1400px; margin: 0 auto;
+  }
+  #why .section-header { margin-bottom: 80px; }
+  #why h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 4vw, 3.8rem); font-weight: 600;
+    color: var(--ice-white);
+  }
+
+  .why-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px;
+    border: 1px solid var(--frost-border);
+    border-radius: 20px; overflow: hidden;
+  }
+  .why-item {
+    padding: 50px 48px;
+    background: rgba(6,20,40,0.5);
+    border: 1px solid var(--frost-border);
+    transition: background 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .why-item::before {
+    content: attr(data-num);
+    position: absolute; right: 30px; top: 20px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 5rem; font-weight: 700;
+    color: rgba(77,184,255,0.04); line-height: 1;
+  }
+  .why-item:hover { background: rgba(26,74,122,0.2); }
+  .why-icon { font-size: 2rem; margin-bottom: 20px; display: block; }
+  .why-item h3 {
+    font-family: 'Jost', sans-serif; font-weight: 500;
+    font-size: 1.1rem; letter-spacing: 0.05em;
+    color: var(--ice-crystal); margin-bottom: 12px;
+  }
+  .why-item p { font-size: 0.9rem; line-height: 1.7; color: var(--ice-silver); }
+
+  /* CLIENTS */
+  #clients {
+    padding: 120px 60px; text-align: center;
+    background: linear-gradient(to bottom, transparent, rgba(26,74,122,0.1), transparent);
+  }
+  #clients h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 600;
+    color: var(--ice-white); margin-bottom: 60px;
+  }
+  .client-logos {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    justify-content: center; align-items: center;
+    max-width: 900px; margin: 0 auto;
+  }
+  .client-logo-pill {
+    padding: 14px 28px;
+    background: var(--frost);
+    border: 1px solid var(--frost-border);
+    border-radius: 40px;
+    font-family: 'Jost', sans-serif; font-weight: 400;
+    font-size: 0.85rem; letter-spacing: 0.08em;
+    color: var(--ice-silver);
+    transition: all 0.3s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .client-logo-pill:hover {
+    background: rgba(77,184,255,0.1);
+    border-color: rgba(77,184,255,0.4);
+    color: var(--ice-white);
+    transform: translateY(-3px);
+  }
+  .client-logo-pill .ico { font-size: 1rem; }
+
+  /* CTA */
+  #cta {
+    padding: 140px 60px; text-align: center; position: relative; overflow: hidden;
+  }
+  #cta::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(77,184,255,0.08), transparent);
+    pointer-events: none;
+  }
+  #cta h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 5rem); font-weight: 600;
+    color: var(--ice-white); max-width: 700px; margin: 0 auto 16px;
+    line-height: 1.1;
+  }
+  #cta h2 em { color: var(--ice-bright); font-style: italic; }
+  #cta p { color: var(--ice-silver); max-width: 480px; margin: 0 auto 48px; line-height: 1.7; }
+
+  .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    padding: 18px 48px;
+    background: linear-gradient(135deg, #1a6fbb, #0044aa);
+    color: var(--ice-white);
+    font-family: 'Jost', sans-serif; font-size: 0.85rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    border: none; border-radius: 4px; cursor: pointer;
+    text-decoration: none; display: inline-block;
+    position: relative; overflow: hidden;
+    transition: all 0.3s;
+    box-shadow: 0 0 30px rgba(77,184,255,0.2);
+  }
+  .btn-primary::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.4s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(77,184,255,0.35); }
+  .btn-primary:hover::before { left: 100%; }
+  .btn-secondary {
+    padding: 18px 48px;
+    background: transparent; color: var(--ice-silver);
+    font-family: 'Jost', sans-serif; font-size: 0.85rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    border: 1px solid var(--frost-border); border-radius: 4px;
+    cursor: pointer; text-decoration: none; display: inline-block;
+    transition: all 0.3s;
+  }
+  .btn-secondary:hover {
+    border-color: var(--ice-bright); color: var(--ice-white);
+    background: var(--frost);
+  }
+
+  /* CONTACT */
+  #contact {
+    padding: 100px 60px;
+    max-width: 1000px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+    align-items: start;
+  }
+  .contact-info h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem; font-weight: 600;
+    color: var(--ice-white); margin-bottom: 24px;
+  }
+  .contact-info p { color: var(--ice-silver); line-height: 1.7; margin-bottom: 32px; }
+  .contact-item {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 20px; padding: 16px 20px;
+    background: var(--frost); border: 1px solid var(--frost-border);
+    border-radius: 12px;
+  }
+  .contact-item .ico { font-size: 1.2rem; }
+  .contact-item a { color: var(--ice-silver); text-decoration: none; font-size: 0.9rem; }
+  .contact-item a:hover { color: var(--ice-bright); }
+
+  .contact-form { display: flex; flex-direction: column; gap: 16px; }
+  .form-group {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .form-group label {
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--ice-silver);
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    background: var(--frost); border: 1px solid var(--frost-border);
+    border-radius: 8px; padding: 14px 18px;
+    color: var(--ice-white); font-family: 'Jost', sans-serif; font-size: 0.9rem;
+    outline: none; transition: border-color 0.3s;
+    backdrop-filter: blur(10px);
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(168,220,255,0.3); }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: rgba(77,184,255,0.5);
+    box-shadow: 0 0 0 3px rgba(77,184,255,0.08);
+  }
+  .form-group select option { background: var(--ice-navy); }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .form-submit {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #1a6fbb, #0044aa);
+    color: var(--ice-white); border: none; border-radius: 8px;
+    font-family: 'Jost', sans-serif; font-size: 0.85rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s;
+    box-shadow: 0 0 20px rgba(77,184,255,0.15);
+  }
+  .form-submit:hover {
+    box-shadow: 0 0 40px rgba(77,184,255,0.3);
+    transform: translateY(-1px);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 60px;
+    border-top: 1px solid var(--frost-border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 24px;
+    background: rgba(2,11,24,0.8);
+  }
+  .footer-logo {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 1.2rem; font-weight: 700;
+    letter-spacing: 0.3em; color: var(--ice-white);
+  }
+  .footer-logo span { color: var(--ice-bright); }
+  .footer-tagline {
+    font-size: 0.8rem; color: var(--ice-silver);
+    margin-top: 6px; letter-spacing: 0.1em;
+  }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-links a {
+    font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--ice-silver); text-decoration: none; transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--ice-bright); }
+  .footer-copy { font-size: 0.75rem; color: rgba(168,220,255,0.3); }
+
+  /* SCROLL ANIMATIONS */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+
+  /* Frost shimmer overlay */
+  .frost-shimmer {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse 120% 50% at 50% 0%, rgba(77,184,255,0.03), transparent 60%);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    nav { padding: 20px 30px; }
+    nav.scrolled { padding: 14px 30px; }
+    .nav-links { display: none; }
+    #about { grid-template-columns: 1fr; padding: 80px 30px; gap: 40px; }
+    #products { padding: 80px 30px; }
+    .products-grid { grid-template-columns: 1fr; }
+    #why { padding: 80px 30px; }
+    .why-grid { grid-template-columns: 1fr; }
+    #cta { padding: 80px 30px; }
+    #contact { grid-template-columns: 1fr; padding: 80px 30px; gap: 40px; }
+    footer { padding: 40px 30px; flex-direction: column; }
+    .about-visual { height: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="frost-shimmer"></div>
+<canvas id="particle-canvas"></canvas>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">ICEY<span>9</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#products">Products</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#clients">Clients</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Order Now</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-rings">
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="ring"></div><div class="ring"></div>
+  </div>
+  <div class="hero-ice-cubes" id="iceCubes"></div>
+  <div style="position:relative; z-index:2;">
+    <p class="hero-eyebrow">Premium Ice Manufacturing · Est. by TGP Enterprises</p>
+    <h1 class="hero-title">
+      <span class="ice-gradient">ICEY</span>
+      <span class="hero-number ice-gradient">9</span>
+    </h1>
+    <p class="hero-sub">Where every cube is crafted for perfection</p>
+    <div class="hero-divider"></div>
+    <p class="hero-scroll-hint">Scroll to explore</p>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-visual reveal">
+    <div class="about-cube-art">
+      <div class="big-cube"></div>
+      <div class="small-cube-1"></div>
+      <div class="small-cube-2"></div>
+    </div>
+    <div class="about-stat-grid">
+      <div class="stat-box">
+        <span class="num">10+</span>
+        <span class="lbl">Ice Varieties</span>
+      </div>
+      <div class="stat-box">
+        <span class="num">24/7</span>
+        <span class="lbl">Supply Chain</span>
+      </div>
+      <div class="stat-box">
+        <span class="num">100%</span>
+        <span class="lbl">Hygienic</span>
+      </div>
+      <div class="stat-box">
+        <span class="num">Fast</span>
+        <span class="lbl">Delivery</span>
+      </div>
+    </div>
+  </div>
+  <div class="about-content">
+    <p class="section-tag reveal">About Us</p>
+    <h2 class="reveal reveal-delay-1">Crafting ice that <em>elevates</em> every experience</h2>
+    <p class="reveal reveal-delay-2">Icey 9 is a premium ice manufacturing company dedicated to supplying the finest quality ice to hotels, bars, restaurants, and hospitality venues across the region. Every cube, every batch — crafted with uncompromising hygiene standards.</p>
+    <p class="reveal reveal-delay-3">From signature bullet ice that keeps cocktails crisp, to full-format block ice and specialty shapes — we are your complete cold solution partner.</p>
+    <div class="founder-badge reveal reveal-delay-4">
+      <div class="dot"></div>
+      <span>A venture by <strong>TGP Enterprises</strong></span>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marqueeTrack">
+    <div class="marquee-item">Bullet Ice <span class="dot">·</span> Block Ice <span class="dot">·</span> Crushed Ice <span class="dot">·</span> Cube Ice <span class="dot">·</span> Nugget Ice <span class="dot">·</span> Flake Ice <span class="dot">·</span> Specialty Shapes <span class="dot">·</span> Hotels & Bars Supply <span class="dot">·</span></div>
+    <div class="marquee-item">Bullet Ice <span class="dot">·</span> Block Ice <span class="dot">·</span> Crushed Ice <span class="dot">·</span> Cube Ice <span class="dot">·</span> Nugget Ice <span class="dot">·</span> Flake Ice <span class="dot">·</span> Specialty Shapes <span class="dot">·</span> Hotels & Bars Supply <span class="dot">·</span></div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="products-header">
+    <p class="section-tag reveal" style="justify-content:center">Our Products</p>
+    <h2 class="reveal reveal-delay-1">Every Ice. Every Need.</h2>
+    <p class="reveal reveal-delay-2">Engineered for the hospitality industry — from high-volume bars to fine-dining hotels.</p>
+  </div>
+  <div class="products-grid">
+    <div class="product-card featured reveal">
+      <span class="product-badge">Bestseller</span>
+      <span class="product-icon">🧊</span>
+      <h3>Bullet Ice</h3>
+      <p>Our signature bullet-shaped ice is the gold standard for cocktails and premium beverages. Slow-melt design preserves drink flavour longer.</p>
+      <div class="product-specs">
+        <span class="spec-tag">Slow Melt</span>
+        <span class="spec-tag">Crystal Clear</span>
+        <span class="spec-tag">Food Grade</span>
+      </div>
+    </div>
+    <div class="product-card reveal reveal-delay-1">
+      <span class="product-icon">🧱</span>
+      <h3>Block Ice</h3>
+      <p>Solid block ice for ice carvings, display purposes, and large-scale cooling needs. Ideal for buffet tables and fish displays.</p>
+      <div class="product-specs">
+        <span class="spec-tag">Large Format</span>
+        <span class="spec-tag">Long-lasting</span>
+      </div>
+    </div>
+    <div class="product-card reveal reveal-delay-2">
+      <span class="product-icon">❄️</span>
+      <h3>Crushed Ice</h3>
+      <p>Perfect for frozen cocktails, blended drinks, injury therapy, and seafood displays. Consistent texture every batch.</p>
+      <div class="product-specs">
+        <span class="spec-tag">Fine Grain</span>
+        <span class="spec-tag">Uniform Texture</span>
+      </div>
+    </div>
+    <div class="product-card reveal reveal-delay-3">
+      <span class="product-icon">🔷</span>
+      <h3>Cube Ice</h3>
+      <p>Classic full-cube and half-cube ice for soft drinks, whisky service, and standard bar use. The versatile workhorse of any establishment.</p>
+      <div class="product-specs">
+        <span class="spec-tag">Full Cube</span>
+        <span class="spec-tag">Half Cube</span>
+      </div>
+    </div>
+    <div class="product-card reveal reveal-delay-4">
+      <span class="product-icon">💎</span>
+      <h3>Nugget Ice</h3>
+      <p>Soft, chewable nugget ice — beloved by guests and perfect for blended beverages, smoothies, and specialty cocktails.</p>
+      <div class="product-specs">
+        <span class="spec-tag">Chewable</span>
+        <span class="spec-tag">Porous</span>
+      </div>
+    </div>
+    <div class="product-card reveal reveal-delay-5">
+      <span class="product-icon">🌨️</span>
+      <h3>Flake Ice</h3>
+      <p>Ultra-thin flake ice for seafood presentations, salad bars, healthcare, and fresh produce display. Maximum contact surface for rapid cooling.</p>
+      <div class="product-specs">
+        <span class="spec-tag">Thin Flake</span>
+        <span class="spec-tag">High Surface Area</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why">
+  <div class="section-header">
+    <p class="section-tag reveal">Why Choose Icey 9</p>
+    <h2 class="reveal reveal-delay-1">The cold standard<br>in ice supply.</h2>
+  </div>
+  <div class="why-grid reveal reveal-delay-2">
+    <div class="why-item" data-num="01">
+      <span class="why-icon">🏭</span>
+      <h3>State-of-the-Art Production</h3>
+      <p>Our facility runs ISO-compliant manufacturing processes with automated filtration, ensuring every batch meets the highest purity standards.</p>
+    </div>
+    <div class="why-item" data-num="02">
+      <span class="why-icon">🚚</span>
+      <h3>Reliable On-Time Delivery</h3>
+      <p>A dedicated cold-chain logistics fleet ensures your ice arrives at the right temperature, at the right time — every single time.</p>
+    </div>
+    <div class="why-item" data-num="03">
+      <span class="why-icon">🧪</span>
+      <h3>Hygienic & Food-Safe</h3>
+      <p>All ice is produced from purified water and tested regularly. Full FSSAI compliance guarantees it's safe for any food or beverage application.</p>
+    </div>
+    <div class="why-item" data-num="04">
+      <span class="why-icon">🤝</span>
+      <h3>Dedicated Account Support</h3>
+      <p>A personal account manager for every hotel and bar partner. Flexible volumes, custom schedules, and priority emergency supply available.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section id="clients">
+  <p class="section-tag reveal" style="justify-content:center">Trusted By</p>
+  <h2 class="reveal reveal-delay-1">Serving the finest<br>hotels & bars.</h2>
+  <div class="client-logos reveal reveal-delay-2">
+    <div class="client-logo-pill"><span class="ico">🏨</span> 5-Star Hotels</div>
+    <div class="client-logo-pill"><span class="ico">🍸</span> Craft Cocktail Bars</div>
+    <div class="client-logo-pill"><span class="ico">🍽️</span> Fine Dining Restaurants</div>
+    <div class="client-logo-pill"><span class="ico">🎪</span> Banquet Halls</div>
+    <div class="client-logo-pill"><span class="ico">🍣</span> Seafood & Sushi Restaurants</div>
+    <div class="client-logo-pill"><span class="ico">🎶</span> Nightclubs & Lounges</div>
+    <div class="client-logo-pill"><span class="ico">☕</span> Cafés & QSRs</div>
+    <div class="client-logo-pill"><span class="ico">🏥</span> Healthcare Facilities</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <p class="section-tag reveal" style="justify-content:center">Get Started</p>
+  <h2 class="reveal reveal-delay-1">Ready to keep it <em>ice cold?</em></h2>
+  <p class="reveal reveal-delay-2">Contact us today to discuss your ice requirements. Bulk orders, custom schedules, and emergency supply — we've got you covered.</p>
+  <div class="cta-buttons reveal reveal-delay-3">
+    <a href="#contact" class="btn-primary">Request a Quote</a>
+    <a href="tel:+91XXXXXXXXXX" class="btn-secondary">Call Us Now</a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-info">
+    <p class="section-tag reveal">Get In Touch</p>
+    <h2 class="reveal reveal-delay-1">Let's talk ice.</h2>
+    <p class="reveal reveal-delay-2">Whether you need daily supply, a one-time bulk order, or a long-term hospitality partnership — we're ready.</p>
+    <div class="reveal reveal-delay-3">
+      <div class="contact-item">
+        <span class="ico">📍</span>
+        <a href="#">Maharashtra, India</a>
+      </div>
+      <div class="contact-item">
+        <span class="ico">📞</span>
+        <a href="tel:+91XXXXXXXXXX">+91 XXXX XXX XXX</a>
+      </div>
+      <div class="contact-item">
+        <span class="ico">✉️</span>
+        <a href="mailto:hello@icey9.com">hello@icey9.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="ico">🏢</span>
+        <span style="color:var(--ice-silver); font-size:0.9rem;">TGP Enterprises</span>
+      </div>
+    </div>
+  </div>
+  <form class="contact-form reveal reveal-delay-2" onsubmit="return false;">
+    <div class="form-group">
+      <label>Your Name</label>
+      <input type="text" placeholder="e.g. Raj Sharma">
+    </div>
+    <div class="form-group">
+      <label>Business Name</label>
+      <input type="text" placeholder="Hotel / Bar / Restaurant">
+    </div>
+    <div class="form-group">
+      <label>Ice Type Required</label>
+      <select>
+        <option value="">Select an ice type...</option>
+        <option>Bullet Ice</option>
+        <option>Block Ice</option>
+        <option>Crushed Ice</option>
+        <option>Cube Ice</option>
+        <option>Nugget Ice</option>
+        <option>Flake Ice</option>
+        <option>Multiple / Custom</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Message</label>
+      <textarea placeholder="Tell us about your requirements, volume, frequency..."></textarea>
+    </div>
+    <button type="submit" class="form-submit">Send Enquiry →</button>
+  </form>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">ICEY<span>9</span></div>
+    <div class="footer-tagline">A TGP Enterprises Venture · Premium Ice Manufacturers</div>
+  </div>
+  <div class="footer-links">
+    <a href="#about">About</a>
+    <a href="#products">Products</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2025 Icey 9. All rights reserved.</div>
+</footer>
+
+<script>
+// --- Custom Cursor ---
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  ring.style.left = e.clientX + 'px';
+  ring.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('a, button, .product-card, .why-item, .client-logo-pill').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.style.transform = 'translate(-50%, -50%) scale(1.8)');
+  el.addEventListener('mouseleave', () => ring.style.transform = 'translate(-50%, -50%) scale(1)');
+});
+
+// --- Nav Scroll ---
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// --- Floating Ice Cubes in Hero ---
+const cubeContainer = document.getElementById('iceCubes');
+function spawnCube() {
+  const cube = document.createElement('div');
+  cube.className = 'ice-cube';
+  const size = Math.random() * 40 + 20;
+  cube.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random() * 100}%;
+    animation-duration:${Math.random() * 10 + 12}s;
+    animation-delay:${Math.random() * 5}s;
+    opacity:0;
+  `;
+  cubeContainer.appendChild(cube);
+  setTimeout(() => cube.remove(), 20000);
+}
+for (let i = 0; i < 10; i++) setTimeout(spawnCube, i * 800);
+setInterval(spawnCube, 2000);
+
+// --- Particle Canvas ---
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+const particles = [];
+for (let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.5 + 0.3,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    alpha: Math.random() * 0.4 + 0.1
+  });
+}
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(168, 220, 255, ${p.alpha})`;
+    ctx.fill();
+  });
+  // Draw subtle connections
+  particles.forEach((p1, i) => {
+    particles.slice(i + 1).forEach(p2 => {
+      const dx = p1.x - p2.x, dy = p1.y - p2.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 100) {
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = `rgba(77, 184, 255, ${0.05 * (1 - dist / 100)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    });
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// --- Scroll Reveal ---
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => observer.observe(el));
+
+// --- Smooth anchor scroll ---
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+// --- Form submit feedback ---
+document.querySelector('.form-submit').addEventListener('click', function() {
+  this.textContent = '✓ Enquiry Sent!';
+  this.style.background = 'linear-gradient(135deg, #0a7a40, #006030)';
+  setTimeout(() => {
+    this.textContent = 'Send Enquiry →';
+    this.style.background = '';
+  }, 3000);
+});
+
+// --- Counter animation for stats ---
+function animateCounter(el, target, suffix='') {
+  let start = 0; const step = target / 50;
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { clearInterval(timer); el.textContent = target + suffix; return; }
+    el.textContent = Math.floor(start) + suffix;
+  }, 30);
+}
+const statsObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.num').forEach(num => {
+        const text = num.textContent;
+        if (text.includes('+')) animateCounter(num, parseInt(text), '+');
+        else if (text.includes('%')) animateCounter(num, parseInt(text), '%');
+      });
+      statsObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+const statGrid = document.querySelector('.about-stat-grid');
+if (statGrid) statsObserver.observe(statGrid);
+</script>
+</body>
+</html>
